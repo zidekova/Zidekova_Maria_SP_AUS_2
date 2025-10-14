@@ -7,8 +7,8 @@ public abstract class AbstractTree<T extends Comparable<T>> {
         this.root = null;
     }
 
-    public abstract T search(T data);
-    public abstract AbstractNode<T> insert(T data);
-    public abstract AbstractNode<T> delete(T data);
+    protected abstract T search(T data);
+    protected abstract AbstractNode<T> insert(T data);
+    protected abstract AbstractNode<T> delete(T data);
 
 }

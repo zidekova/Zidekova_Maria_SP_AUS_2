@@ -15,38 +15,38 @@ public class BSTNode<T extends Comparable<T>> extends AbstractNode<T> {
         this.right = null;
     }
 
-    public T getData() {
+    protected T getData() {
         return this.data;
     }
 
-    public void setData(T data) {
+    protected void setData(T data) {
         this.data = data;
     }
 
     @Override
-    public BSTNode<T> getParent() {
+    protected BSTNode<T> getParent() {
         return this.parent;
     }
 
-    public void setParent(BSTNode<T> parent) {
+    protected void setParent(BSTNode<T> parent) {
         this.parent = parent;
     }
 
     @Override
-    public BSTNode<T> getLeft() {
+    protected BSTNode<T> getLeft() {
         return this.left;
     }
 
-    public void setLeft(BSTNode<T> left) {
-        this.left = left;
+    protected void setLeft(BSTNode<T> leftSon) {
+        this.left = leftSon;
     }
 
     @Override
-    public BSTNode<T> getRight() {
+    protected BSTNode<T> getRight() {
         return this.right;
     }
 
-    public void setRight(BSTNode<T> right) {
-        this.right = right;
+    protected void setRight(BSTNode<T> rightSon) {
+        this.right = rightSon;
     }
 }

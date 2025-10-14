@@ -55,7 +55,7 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
         BSTNode<T> current = this.getRoot();
 
         while (current != null) {
-            int  compareResult = data.compareTo(current.getData());
+            int compareResult = data.compareTo(current.getData());
             if (compareResult == 0) {
                 return current.getData();
             } else if (compareResult < 0) {
@@ -177,15 +177,15 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
         return null;
     }
 
-    public BSTNode<T> getRoot() {
+    protected BSTNode<T> getRoot() {
         return (BSTNode<T>) this.root;
     }
 
-    public int getTreeHeight() {
+    protected int getTreeHeight() {
         return calculateHeight(this.getRoot());
     }
 
-    private int calculateHeight(BSTNode<T> node) {
+    protected int calculateHeight(BSTNode<T> node) {
         if (node == null) return 0;
         return 1 + Math.max(calculateHeight(node.getLeft()), calculateHeight(node.getRight()));
     }

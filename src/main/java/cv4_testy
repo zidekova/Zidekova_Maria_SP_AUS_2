@@ -1,0 +1,5 @@
+1. nahodne si vyber operaciu (insert, search, delete)
+2. prvky ktore sa vkladaju pri inserte sa vkladaju aj do listu pre search
+- nahodny index od 0 do size
+- takisto pre delete
+3. stracanie prvkov - porovnanie napr. poctu prvkov

@@ -1,9 +1,9 @@
 package abs;
 
 public abstract class AbstractNode<T extends Comparable<T>> {
-    private final AbstractNode<T> parent;
-    private final AbstractNode<T> leftSon;
-    private final AbstractNode<T> rightSon;
+    private AbstractNode<T> parent;
+    private AbstractNode<T> leftSon;
+    private AbstractNode<T> rightSon;
 
     public AbstractNode() {
         this.parent = null;
