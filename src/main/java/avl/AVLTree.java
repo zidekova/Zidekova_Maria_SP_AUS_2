@@ -23,9 +23,10 @@ public class AVLTree<T extends Comparable<T>> extends BSTree<T> {
 
         AVLNode<T> current = inserted.getParent();
         while (current != null) {
-            this.updateNode(current);
+            this.updateHeight(current);
+            int balanceFactor = this.getBalanceFactor(current);
 
-            if (current.getBalanceFactor() < -1 || current.getBalanceFactor() > 1) {
+            if (balanceFactor < -1 || balanceFactor > 1) {
                 this.balance(current);
             }
 
@@ -47,9 +48,10 @@ public class AVLTree<T extends Comparable<T>> extends BSTree<T> {
         if (current == null) return null;
 
         while (current != null) {
-            this.updateNode(current);
+            this.updateHeight(current);
+            int balanceFactor = this.getBalanceFactor(current);
 
-            if (current.getBalanceFactor() < -1 || current.getBalanceFactor() > 1) {
+            if (balanceFactor < -1 || balanceFactor > 1) {
                 this.balance(current);
             }
 
@@ -85,8 +87,8 @@ public class AVLTree<T extends Comparable<T>> extends BSTree<T> {
         }
 
         // update heights and balance factors
-        updateNode(node);
-        updateNode(rightSon);
+        updateHeight(node);
+        updateHeight(rightSon);
 
     }
 
@@ -116,19 +118,21 @@ public class AVLTree<T extends Comparable<T>> extends BSTree<T> {
         }
 
         // update heights and balance factors
-        updateNode(node);
-        updateNode(leftSon);
+        updateHeight(node);
+        updateHeight(leftSon);
     }
 
     private void balance(AVLNode<T> node) {
-        int balanceFactor = node.getBalanceFactor();
+        int heightLeft = (node.getLeft() != null) ? node.getLeft().getHeight() : 0;
+        int heightRight = (node.getRight() != null) ? node.getRight().getHeight() : 0;
+        int balanceFactor = heightRight - heightLeft;
 
         // L
         if (balanceFactor < -1) {
             AVLNode<T> leftSon = node.getLeft();
 
             // LR
-            if (leftSon.getBalanceFactor() > 0) {
+            if (this.getBalanceFactor(leftSon) > 0) {
                 this.leftRotation(leftSon);
             }
             // LL
@@ -140,7 +144,7 @@ public class AVLTree<T extends Comparable<T>> extends BSTree<T> {
             AVLNode<T> rightSon = node.getRight();
 
             // RL
-            if (rightSon.getBalanceFactor() < 0) {
+            if (this.getBalanceFactor(rightSon) < 0) {
                 this.rightRotation(rightSon);
             }
             // RR
@@ -148,10 +152,15 @@ public class AVLTree<T extends Comparable<T>> extends BSTree<T> {
         }
     }
 
-    private void updateNode(AVLNode<T> node) {
+    private int getBalanceFactor(AVLNode<T> node) {
+        int leftHeight = (node.getLeft() != null) ? node.getLeft().getHeight() : 0;
+        int rightHeight = (node.getRight() != null) ? node.getRight().getHeight() : 0;
+        return rightHeight - leftHeight;
+    }
+
+    private void updateHeight(AVLNode<T> node) {
         int heightLeft = (node.getLeft() != null) ? (node.getLeft()).getHeight() : 0;
         int heightRight = (node.getRight() != null) ? (node.getRight()).getHeight() : 0;
         node.setHeight(1 + Math.max(heightLeft, heightRight));
-        node.setBalanceFactor(heightRight - heightLeft);
     }
 }

@@ -5,12 +5,10 @@ import bst.BSTNode;
 
 public class AVLNode<T extends Comparable<T>> extends BSTNode<T> {
     private int height;
-    private int balanceFactor;
 
     public AVLNode(T data) {
         super(data);
         this.height = 1;
-        this.balanceFactor = 0;
     }
 
     @Override
@@ -49,13 +47,5 @@ public class AVLNode<T extends Comparable<T>> extends BSTNode<T> {
 
     protected void setHeight(int height) {
         this.height = height;
-    }
-
-    protected int getBalanceFactor() {
-        return this.balanceFactor;
-    }
-
-    protected void setBalanceFactor(int balanceFactor) {
-        this.balanceFactor = balanceFactor;
     }
 }

@@ -2,7 +2,7 @@ package bst;
 
 import abs.AbstractTree;
 
-import java.util.List;
+import java.util.*;
 
 public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
     public BSTree() {
@@ -108,8 +108,8 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
         if (current.getLeft() == null || current.getRight() == null) {
             BSTNode<T> child = (current.getLeft() != null) ? current.getLeft() : current.getRight();
 
-            if (current == root) {
-                root = child;
+            if (current == this.root) {
+                this.root = child;
             } else if ((parent != null ? parent.getLeft() : null) == current) {
                 parent.setLeft(child);
             } else {
@@ -148,7 +148,7 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
         return successor;
     }
 
-    public BSTNode<T> findMin() {
+    public T findMin() {
         if (this.root == null) return null;
 
         BSTNode<T> current = (BSTNode<T>) this.root;
@@ -157,10 +157,10 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
             current = current.getLeft();
 
         }
-        return current;
+        return current.getData();
     }
 
-    public BSTNode<T> findMax() {
+    public T findMax() {
         if (this.root == null) return null;
 
         BSTNode<T> current = (BSTNode<T>) this.root;
@@ -169,25 +169,72 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
             current = current.getRight();
         }
 
-        return current;
+        return current.getData();
     }
 
+    public int size() {
+        return this.inorder().size();
+    }
+
+
     public List<T> intervalSearch(T from, T to) {
-        // TODO
-        return null;
+        List<T> result = new ArrayList<>();
+        if (this.root == null) return result;
+
+        Stack<BSTNode<T>> stack = new Stack<>();
+        BSTNode<T> current = this.getRoot();
+
+        while (current != null || !stack.isEmpty()) {
+            while (current != null) {
+                stack.push(current);
+                if (from == null || current.getData().compareTo(from) > 0)
+                    current = current.getLeft();
+                else
+                    break;
+            }
+
+            current = stack.pop();
+            T val = current.getData();
+
+            if (from != null && val.compareTo(from) < 0) {
+                current = current.getRight();
+                continue;
+            }
+            if (to != null && val.compareTo(to) > 0) {
+                break;
+            }
+
+            result.add(val);
+
+            current = current.getRight();
+        }
+
+        return result;
+    }
+
+    public List<T> inorder() {
+        List<T> result = new ArrayList<>();
+        if (this.root == null) return result;
+
+        Stack<BSTNode<T>> stack = new Stack<>();
+        BSTNode<T> current = this.getRoot();
+
+        while (current != null || !stack.isEmpty()) {
+            while (current != null) {
+                stack.push(current);
+                current = current.getLeft();
+            }
+
+            current = stack.pop();
+            result.add(current.getData());
+            current = current.getRight();
+        }
+
+        return result;
     }
 
     protected BSTNode<T> getRoot() {
         return (BSTNode<T>) this.root;
-    }
-
-    protected int getTreeHeight() {
-        return calculateHeight(this.getRoot());
-    }
-
-    protected int calculateHeight(BSTNode<T> node) {
-        if (node == null) return 0;
-        return 1 + Math.max(calculateHeight(node.getLeft()), calculateHeight(node.getRight()));
     }
 
     public void printTree() {

@@ -17,6 +17,12 @@ public class Main {
 //        System.out.println("\nInsert:");
 //        bst.printTree();
 //
+//        List<Integer> is = bst.intervalSearch(3, 12);
+//        System.out.print("Interval search from 3 to 12: ");
+//        for (Integer i : is) {
+//            System.out.print(i + " ");
+//        }
+//
 //        System.out.println("\nSearch 9: " + bst.search(9));
 //        System.out.println("Search (not in the tree) 1: " + bst.search(1));
 //        System.out.println("Search 10 in empty tree: " + bst_empty.search(10));
@@ -44,7 +50,7 @@ public class Main {
 //        bst_empty.delete(9);
 //        System.out.println("\nDelete (from empty tree) 9:");
 //        bst_empty.printTree();
-
+//
         AVLTree<Integer> avl = new AVLTree<>();
         AVLTree<Integer> avl_empty = new AVLTree<>();
 
@@ -54,10 +60,16 @@ public class Main {
         System.out.println("\nInsert:");
         avl.printTree();
 
+        List<Integer> is = avl.intervalSearch(3, 12);
+        System.out.print("Interval search from 3 to 12: ");
+        for (Integer i : is) {
+            System.out.print(i + " ");
+        }
+
         System.out.println("\nSearch 9: " + avl.search(9));
         System.out.println("Search (not in the tree) 1: " + avl.search(1));
         System.out.println("Search 10 in empty tree: " + avl_empty.search(10));
-//
+
 //        avl.delete(3);
 //        System.out.println("\nDelete leaf 3:");
 //        avl.printTree();
