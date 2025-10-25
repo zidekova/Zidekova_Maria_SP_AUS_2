@@ -10,7 +10,7 @@ public class TreeFunctionalTest {
         BSTree<Integer> bst = new BSTree<>();
         AVLTree<Integer> avl = new AVLTree<>();
 
-        System.out.println("=== FUNCTIONAL TESTS OF BSTREE AND AVLTREE ===\n");
+        System.out.println("=== FUNCTIONAL TESTS OF BSTREE AND AVLTREE ===");
 
         System.out.println("\n--- BSTREE ---");
         testTree(bst);

@@ -172,44 +172,96 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
         return current.getData();
     }
 
-    public int size() {
-        return this.inorder().size();
-    }
-
-
     public List<T> intervalSearch(T from, T to) {
         List<T> result = new ArrayList<>();
-        if (this.root == null) return result;
 
-        Stack<BSTNode<T>> stack = new Stack<>();
-        BSTNode<T> current = this.getRoot();
+        if (this.root == null || from.compareTo(to) > 0) {
+            return result;
+        }
 
-        while (current != null || !stack.isEmpty()) {
-            while (current != null) {
-                stack.push(current);
-                if (from == null || current.getData().compareTo(from) > 0)
-                    current = current.getLeft();
-                else
-                    break;
-            }
+        BSTNode<T> current = findFirstInRange(this.getRoot(), from, to);
 
-            current = stack.pop();
-            T val = current.getData();
-
-            if (from != null && val.compareTo(from) < 0) {
-                current = current.getRight();
-                continue;
-            }
-            if (to != null && val.compareTo(to) > 0) {
-                break;
-            }
-
-            result.add(val);
-
-            current = current.getRight();
+        while (current != null) {
+            result.add(current.getData());
+            current = getNextInRange(current, from, to);
         }
 
         return result;
+    }
+
+    private BSTNode<T> findFirstInRange(BSTNode<T> node, T from, T to) {
+        BSTNode<T> current = node;
+        BSTNode<T> firstInRange = null;
+
+        while (current != null) {
+            int compareLow = from.compareTo(current.getData());
+            int compareHigh = to.compareTo(current.getData());
+
+            if (compareLow <= 0 && compareHigh >= 0) {
+                firstInRange = current;
+            }
+
+            if (compareLow < 0) {
+                current = current.getLeft();
+            } else {
+                current = current.getRight();
+            }
+        }
+
+        return firstInRange;
+    }
+
+    private BSTNode<T> getNextInRange(BSTNode<T> node, T from, T to) {
+        BSTNode<T> current = node;
+        BSTNode<T> successor;
+
+        if (current.getRight() != null) {
+            BSTNode<T> temp = current.getRight();
+            while (temp.getLeft() != null) {
+                temp = temp.getLeft();
+            }
+            current = temp;
+        } else {
+            BSTNode<T> parent = current.getParent();
+            while (parent != null && current == parent.getRight()) {
+                current = parent;
+                parent = parent.getParent();
+            }
+            current = parent;
+        }
+
+        while (current != null && (current.getData().compareTo(to) > 0 || current.getData().compareTo(from) < 0)) {
+            if (current.getData().compareTo(to) > 0) {
+                BSTNode<T> parent = current.getParent();
+                while (parent != null && current == parent.getRight()) {
+                    current = parent;
+                    parent = parent.getParent();
+                }
+                current = parent;
+            } else { // current < from
+                if (current.getRight() != null) {
+                    BSTNode<T> temp = current.getRight();
+                    while (temp.getLeft() != null) {
+                        temp = temp.getLeft();
+                    }
+                    current = temp;
+                } else {
+                    BSTNode<T> parent = current.getParent();
+                    while (parent != null && current == parent.getRight()) {
+                        current = parent;
+                        parent = parent.getParent();
+                    }
+                    current = parent;
+                }
+            }
+        }
+
+        successor = current;
+        return successor;
+    }
+
+    public int size() {
+        return this.inorder().size();
     }
 
     public List<T> inorder() {
@@ -261,5 +313,4 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
             printTree(node.getLeft(), newPrefix, true, false);
         }
     }
-
 }

@@ -93,12 +93,17 @@ public class TreePerformanceTest {
     }
 
     private long testIntervalSearch(BSTree<Integer> tree, List<Integer> data) {
-        long startTime = System.currentTimeMillis();
+        List<Integer> sortedData = new ArrayList<>(data);
+        Collections.sort(sortedData);
 
-        int n = data.size();
+        long startTime = System.currentTimeMillis();
+        int n = sortedData.size();
         for (int i = 0; i < INTERVAL_SEARCH_COUNT; i++) {
-            int from = data.get(random.nextInt(n - 1000));
-            int to = from + 500;
+            int fromIndex = random.nextInt(n - 1000);
+            int toIndex = fromIndex + 500;
+            int from  = sortedData.get(fromIndex);
+            int to = sortedData.get(toIndex);
+
             tree.intervalSearch(from, to);
         }
 
@@ -155,13 +160,20 @@ public class TreePerformanceTest {
         long searchTime = System.currentTimeMillis() - start;
         System.out.printf("Random search %,d elements: %,d ms%n", SEARCH_COUNT, searchTime);
 
-        // test interval search (subSet)
+        // test interval search
+        List<Integer> sortedData = new ArrayList<>(insertData);
+        Collections.sort(sortedData);
+
         start = System.currentTimeMillis();
-        int n = insertData.size();
+        int n = sortedData.size();
         for (int i = 0; i < INTERVAL_SEARCH_COUNT; i++) {
-            int from = insertData.get(random.nextInt(n - 1000));
-            int to = from + 500;
-            tree.subSet(from, true, to, true);
+            int fromIndex = random.nextInt(n - 1000);
+            int toIndex = fromIndex + 500;
+            int from  = sortedData.get(fromIndex);
+            int to = sortedData.get(toIndex);
+
+            SortedSet<Integer> set = tree.subSet(from, true, to, true);
+            ArrayList<Integer> list = new ArrayList<>(set);
         }
         long intervalTime = System.currentTimeMillis() - start;
         System.out.printf("Interval search %,d times: %,d ms%n", INTERVAL_SEARCH_COUNT, intervalTime);
