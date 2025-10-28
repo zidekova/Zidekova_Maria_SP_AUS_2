@@ -16,7 +16,8 @@ public class TreePerformanceTest {
 
     static void main(String[] args) {
         TreePerformanceTest test = new TreePerformanceTest();
-        test.runAllTests();
+        //test.runAllTests();
+        test.runSortedDataTest();
     }
 
     public void runAllTests() {
@@ -43,6 +44,32 @@ public class TreePerformanceTest {
         TreeSet<Integer> treeSet = new TreeSet<>();
         testTreeSet(treeSet, insertData, deleteData, searchData);
     }
+
+    public void runSortedDataTest() {
+        System.out.println("=== PERFORMANCE TEST WITH SORTED DATA ===\n");
+
+        // generate sorted data
+        System.out.println("GENERATING SORTED DATA...");
+        List<Integer> insertData = generateSortedData();
+        List<Integer> deleteData = insertData.subList(0, DELETE_COUNT);
+        List<Integer> searchData = insertData.subList(0, SEARCH_COUNT);
+
+        // BST
+        System.out.println("\n--- BSTREE ---");
+        BSTree<Integer> bstTree = new BSTree<>();
+        testTree(bstTree, insertData, deleteData, searchData);
+
+        // AVL
+        System.out.println("\n--- AVLTREE ---");
+        AVLTree<Integer> avlTree = new AVLTree<>();
+        testTree(avlTree, insertData, deleteData, searchData);
+
+        // TREESET
+        System.out.println("\n--- TREESET ---");
+        TreeSet<Integer> treeSet = new TreeSet<>();
+        testTreeSet(treeSet, insertData, deleteData, searchData);
+    }
+
 
     private void testTree(BSTree<Integer> tree, List<Integer> insertData, List<Integer> deleteData, List<Integer> searchData) {
         // test insert
@@ -220,66 +247,13 @@ public class TreePerformanceTest {
         return data;
     }
 
-    public void smallTest() {
-        System.out.println("=== SMALL TEST ===");
+    private List<Integer> generateSortedData() {
+        List<Integer> data = new ArrayList<>(INSERT_COUNT);
 
-        AVLTree<Integer> avl = new AVLTree<>();
-        BSTree<Integer> bst = new BSTree<>();
-
-        List<Integer> sortedData =  new ArrayList<>();
-
-        for (int i = 0; i < 100000; i++) {
-            sortedData.add(i);
+        for (int i = 0; i < INSERT_COUNT; i++) {
+            data.add(i);
         }
 
-        System.out.println("Inserting data in AVL...");
-        long start = System.currentTimeMillis();
-        for (Integer num : sortedData) {
-            avl.insert(num);
-        }
-        long avlTimeInsert = System.currentTimeMillis() - start;
-
-        System.out.println("Inserting data in BST...");
-        start = System.currentTimeMillis();
-        for (Integer num : sortedData) {
-            bst.insert(num);
-        }
-        long bstTimeInsert = System.currentTimeMillis() - start;
-
-        System.out.println("Searching in AVL...");
-        start = System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
-            avl.search(5296);
-        }
-        long avlTimeSearch = System.currentTimeMillis() - start;
-
-        System.out.println("Searching in BST...");
-        start = System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
-            bst.search(5296);
-        }
-        long bstTimeSearch = System.currentTimeMillis() - start;
-
-        System.out.println("Deleting in AVL...");
-        start = System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
-            avl.delete(5296);
-        }
-        long avlTimeDelete = System.currentTimeMillis() - start;
-
-        System.out.println("Deleting in BST...");
-        start = System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
-            bst.delete(5296);
-        }
-        long bstTimeDelete = System.currentTimeMillis() - start;
-
-        System.out.printf("AVL insert time: %d ms%n", avlTimeInsert);
-        System.out.printf("BST insert time: %d ms%n", bstTimeInsert);
-        System.out.printf("AVL search time: %d ms%n", avlTimeSearch);
-        System.out.printf("BST search time: %d ms%n", bstTimeSearch);
-        System.out.printf("AVL delete time: %d ms%n", avlTimeDelete);
-        System.out.printf("BST delete time: %d ms%n", bstTimeDelete);
+        return data;
     }
-
 }

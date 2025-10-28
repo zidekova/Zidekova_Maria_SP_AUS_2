@@ -61,6 +61,40 @@ public class AVLTree<T extends Comparable<T>> extends BSTree<T> {
         return current;
     }
 
+    @Override
+    public boolean verifyTree() {
+        return verifyAVL((AVLNode<T>) this.getRoot());
+    }
+
+    private boolean verifyAVL(AVLNode<T> node) {
+        if (node == null) return true;
+
+        boolean leftOK = verifyAVL(node.getLeft());
+        boolean rightOK = verifyAVL(node.getRight());
+        if (!leftOK || !rightOK) return false;
+
+        int leftHeight = (node.getLeft() != null) ? node.getLeft().getHeight() : 0;
+        int rightHeight = (node.getRight() != null) ? node.getRight().getHeight() : 0;
+        int balance = rightHeight - leftHeight;
+
+        // verify height
+        int expectedHeight = 1 + Math.max(leftHeight, rightHeight);
+        if (node.getHeight() != expectedHeight) {
+            System.err.println("Height error at node " + node.getData() +
+                    " (expected=" + expectedHeight + ", actual=" + node.getHeight() + ")");
+            return false;
+        }
+
+        // verify balance
+        if (Math.abs(balance) > 1) {
+            System.err.println("Balance error at node " + node.getData() +
+                    " (LH=" + leftHeight + ", RH=" + rightHeight + ")");
+            return false;
+        }
+
+        return true;
+    }
+
     private void leftRotation(AVLNode<T> node) {
         AVLNode<T> rightSon = node.getRight();
         AVLNode<T> leftSonOfRightSon = rightSon.getLeft();

@@ -194,22 +194,22 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
         BSTNode<T> firstInRange = null;
 
         while (current != null) {
-            int compareLow = from.compareTo(current.getData());
-            int compareHigh = to.compareTo(current.getData());
+            int cmpLow = from.compareTo(current.getData());
+            int cmpHigh = to.compareTo(current.getData());
 
-            if (compareLow <= 0 && compareHigh >= 0) {
+            if (cmpLow <= 0 && cmpHigh >= 0) {
                 firstInRange = current;
-            }
-
-            if (compareLow < 0) {
                 current = current.getLeft();
-            } else {
+            } else if (cmpLow > 0) {
                 current = current.getRight();
+            } else {
+                current = current.getLeft();
             }
         }
 
         return firstInRange;
     }
+
 
     private BSTNode<T> getNextInRange(BSTNode<T> node, T from, T to) {
         BSTNode<T> current = node;
@@ -264,7 +264,7 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
         return this.inorder().size();
     }
 
-    public List<T> inorder() {
+    private List<T> inorder() {
         List<T> result = new ArrayList<>();
         if (this.root == null) return result;
 
@@ -285,9 +285,51 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
         return result;
     }
 
+    private List<T> levelorder() {
+        List<T> result = new ArrayList<>();
+        if (this.root == null) return result;
+
+        Queue<BSTNode<T>> queue = new LinkedList<>();
+        queue.add(this.getRoot());
+
+        while (!queue.isEmpty()) {
+            BSTNode<T> current = queue.poll();
+            result.add(current.getData());
+
+            if (current.getLeft() != null) {
+                queue.add(current.getLeft());
+            }
+            if (current.getRight() != null) {
+                queue.add(current.getRight());
+            }
+        }
+
+        return result;
+    }
+
+
     protected BSTNode<T> getRoot() {
         return (BSTNode<T>) this.root;
     }
+
+    public boolean verifyTree() {
+        return verifyBST(this.getRoot(), null, null);
+    }
+
+    // verifies, that all values in left subtree are less than in the right subtree
+    private boolean verifyBST(BSTNode<T> node, T min, T max) {
+        if (node == null) return true;
+
+        T value = node.getData();
+
+        if ((min != null && value.compareTo(min) <= 0) || (max != null && value.compareTo(max) >= 0)) {
+            System.err.println("BST error at node " + value + " (min=" + min + ", max=" + max + ")");
+            return false;
+        }
+
+        return verifyBST(node.getLeft(), min, value) && verifyBST(node.getRight(), value, max);
+    }
+
 
     public void printTree() {
         printTree(this.getRoot(), "", true, true);

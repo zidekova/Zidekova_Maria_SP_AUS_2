@@ -41,6 +41,11 @@ public class AVLNode<T extends Comparable<T>> extends BSTNode<T> {
         super.setParent(parent);
     }
 
+    @Override
+    protected T getData() {
+        return super.getData();
+    }
+
     protected int getHeight() {
         return height;
     }
