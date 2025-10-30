@@ -264,22 +264,32 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
         return this.inorder().size();
     }
 
-    private List<T> inorder() {
+    public List<T> inorder() {
         List<T> result = new ArrayList<>();
         if (this.root == null) return result;
 
-        Stack<BSTNode<T>> stack = new Stack<>();
         BSTNode<T> current = this.getRoot();
+        BSTNode<T> predecessor;
 
-        while (current != null || !stack.isEmpty()) {
-            while (current != null) {
-                stack.push(current);
-                current = current.getLeft();
+        while (current != null) {
+            if (current.getLeft() == null) {
+                result.add(current.getData());
+                current = current.getRight();
+            } else {
+                predecessor = current.getLeft();
+                while (predecessor.getRight() != null && predecessor.getRight() != current) {
+                    predecessor = predecessor.getRight();
+                }
+
+                if (predecessor.getRight() == null) {
+                    predecessor.setRight(current);
+                    current = current.getLeft();
+                } else {
+                    predecessor.setRight(null);
+                    result.add(current.getData());
+                    current = current.getRight();
+                }
             }
-
-            current = stack.pop();
-            result.add(current.getData());
-            current = current.getRight();
         }
 
         return result;

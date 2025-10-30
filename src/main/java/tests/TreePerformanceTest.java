@@ -21,7 +21,7 @@ public class TreePerformanceTest {
     }
 
     public void runAllTests() {
-        System.out.println("=== PERFORMANCE TESTS OF BSTREE, AVLTREE AND TREESET ===\n");
+        System.out.println(".....PERFORMANCE TESTS OF BSTREE, AVLTREE AND TREESET.....\n");
 
         // generate data
         System.out.println("GENERATING DATA...");
@@ -30,23 +30,23 @@ public class TreePerformanceTest {
         List<Integer> searchData = insertData.subList(0, SEARCH_COUNT);
 
         // BST
-        System.out.println("\n--- BSTREE ---");
+        System.out.println("\n... BSTREE ...");
         BSTree<Integer> bstTree = new BSTree<>();
         testTree(bstTree, insertData, deleteData, searchData);
 
         // AVL
-        System.out.println("\n--- AVLTREE ---");
+        System.out.println("\n... AVLTREE ...");
         AVLTree<Integer> avlTree = new AVLTree<>();
         testTree(avlTree, insertData, deleteData, searchData);
 
         // TREESET
-        System.out.println("\n--- TREESET ---");
+        System.out.println("\n... TREESET ...");
         TreeSet<Integer> treeSet = new TreeSet<>();
         testTreeSet(treeSet, insertData, deleteData, searchData);
     }
 
     public void runSortedDataTest() {
-        System.out.println("=== PERFORMANCE TEST WITH SORTED DATA ===\n");
+        System.out.println(".....PERFORMANCE TEST WITH SORTED DATA.....\n");
 
         // generate sorted data
         System.out.println("GENERATING SORTED DATA...");
@@ -55,17 +55,17 @@ public class TreePerformanceTest {
         List<Integer> searchData = insertData.subList(0, SEARCH_COUNT);
 
         // BST
-        System.out.println("\n--- BSTREE ---");
+        System.out.println("\n... BSTREE ...");
         BSTree<Integer> bstTree = new BSTree<>();
         testTree(bstTree, insertData, deleteData, searchData);
 
         // AVL
-        System.out.println("\n--- AVLTREE ---");
+        System.out.println("\n... AVLTREE ...");
         AVLTree<Integer> avlTree = new AVLTree<>();
         testTree(avlTree, insertData, deleteData, searchData);
 
         // TREESET
-        System.out.println("\n--- TREESET ---");
+        System.out.println("\n... TREESET ...");
         TreeSet<Integer> treeSet = new TreeSet<>();
         testTreeSet(treeSet, insertData, deleteData, searchData);
     }
