@@ -2,7 +2,9 @@ package bst;
 
 import abs.AbstractTree;
 
+import java.io.*;
 import java.util.*;
+import java.util.function.Function;
 
 public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
     public BSTree() {
@@ -340,29 +342,41 @@ public class BSTree<T extends Comparable<T>> extends AbstractTree<T> {
         return verifyBST(node.getLeft(), min, value) && verifyBST(node.getRight(), value, max);
     }
 
+    public void saveToCSV(String filename, boolean includeHeaders) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
+            if (includeHeaders) {
+                writer.println("data");
+            }
 
-    public void printTree() {
-        printTree(this.getRoot(), "", true, true);
+            List<T> elements = this.levelorder();
+            for (T element : elements) {
+                writer.println(element.toString());
+            }
+        } catch (IOException e) {
+            System.err.println("Error saving to CSV: " + e.getMessage());
+        }
     }
 
-    private void printTree(BSTNode<T> node, String prefix, boolean isTail, boolean isRoot) {
-        if (node == null) return;
+    public void loadFromCSV(String filename, Function<String, T> parser) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            boolean firstLine = true;
 
-        if (isRoot) {
-            System.out.println(node.getData() + " ──┐");
-        } else {
-            String connector = isTail ? "└── " : "├── ";
-            String direction = isTail ? "L:" : "R:";
-            System.out.println(prefix + connector + direction + node.getData());
-        }
+            while ((line = reader.readLine()) != null) {
+                if (firstLine) {
+                    firstLine = false;
+                    continue;
+                }
 
-        String newPrefix = prefix + (isTail ? "    " : "│   ");
-
-        if (node.getRight() != null) {
-            printTree(node.getRight(), newPrefix, false, false);
-        }
-        if (node.getLeft() != null) {
-            printTree(node.getLeft(), newPrefix, true, false);
+                if (!line.trim().isEmpty()) {
+                    T element = parser.apply(line.trim());
+                    if (element != null) {
+                        this.insert(element);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error loading from CSV: " + e.getMessage());
         }
     }
 }

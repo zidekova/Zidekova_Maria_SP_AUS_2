@@ -16,8 +16,8 @@ public class TreePerformanceTest {
 
     static void main(String[] args) {
         TreePerformanceTest test = new TreePerformanceTest();
-        //test.runAllTests();
-        test.runSortedDataTest();
+        test.runAllTests();
+        //test.runSortedDataTest();
     }
 
     public void runAllTests() {

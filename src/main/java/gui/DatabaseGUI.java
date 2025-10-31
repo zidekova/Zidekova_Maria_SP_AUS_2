@@ -1,5 +1,7 @@
 package gui;
 
+import data.DistrictBySickCount;
+import data.RegionBySickCount;
 import database.Database;
 import data.PCRTest;
 import data.Person;
@@ -7,6 +9,7 @@ import data.Person;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -90,7 +93,9 @@ public class DatabaseGUI extends JFrame {
                 {"19) Vložiť osobu", "actionInsertPersonDetail"},
                 {"20) Vymazať test", "actionDeleteTest"},
                 {"21) Vymazať osobu", "actionDeletePerson"},
-                {"Generovať", "actionGenerateAsync"}
+                {"Generovať", "actionGenerateAsync"},
+                {"Export CSV", "actionExportCSV"},
+                {"Import CSV", "actionImportCSV"}
         });
 
         JPanel horizontalPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
@@ -142,6 +147,8 @@ public class DatabaseGUI extends JFrame {
                 case "actionDeleteTest": button.addActionListener(this::actionDeleteTest); break;
                 case "actionDeletePerson": button.addActionListener(this::actionDeletePerson); break;
                 case "actionGenerateAsync": button.addActionListener(this::actionGenerateAsync); break;
+                case "actionExportCSV": button.addActionListener(this::actionExportCSV); break;
+                case "actionImportCSV": button.addActionListener(this::actionImportCSV); break;
             }
 
             panel.add(button);
@@ -183,6 +190,22 @@ public class DatabaseGUI extends JFrame {
             return new LocalDateTime[]{f.atStartOfDay(), t.atTime(23,59,59)};
         } catch (DateTimeParseException ex) {
             showError("Neplatný formát dátumu. Použi YYYY-MM-DD.");
+            return null;
+        }
+    }
+
+    private LocalDateTime showDateTimeInputDialog() {
+        String dateStr = showInputDialog("Zadajte dátum (YYYY-MM-DD):", "Dátum");
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            showError("Zadajte dátum");
+            return null;
+        }
+
+        try {
+            LocalDate date = LocalDate.parse(dateStr.trim());
+            return date.atStartOfDay();
+        } catch (Exception e) {
+            showError("Neplatný formát dátumu. Použite formát YYYY-MM-DD.");
             return null;
         }
     }
@@ -257,10 +280,15 @@ public class DatabaseGUI extends JFrame {
         int testId = showIntInputDialog("ID testu:", "ID testu");
         if (testId == Integer.MIN_VALUE) return;
 
+        Person person = db.searchPersonByPatientId(pid.trim());
+
         PCRTest t = db.searchTestResultByTestId(pid.trim(), testId);
-        output.setText("");
-        if (t == null) appendAndScroll("Test nenájdený pre pacienta: " + pid + ", ID testu = " + testId);
-        else displayTests(List.of(t), "Test pacienta " + pid + " (ID testu = " + testId + ")");
+
+        if (t == null) {
+            appendAndScroll("Test nenájdený pre pacienta: " + pid + ", ID testu = " + testId);
+        } else {
+            displayTests(List.of(t), "Test " + testId + ": " + formatPersonLine(person));
+        }
     }
 
     // 3) list of all test for a patient sorted by a date
@@ -271,8 +299,11 @@ public class DatabaseGUI extends JFrame {
             return;
         }
 
+        Person person = db.searchPersonByPatientId(pid.trim());
+
         List<PCRTest> tests = db.getAllTestsForPatient(pid.trim());
-        displayTests(tests, "Všetky testy pacienta " + pid);
+
+        displayTests(tests, "Všetky testy pacienta: " + formatPersonLine(person));
     }
 
     // 17) tests for workplace in interval
@@ -369,12 +400,14 @@ public class DatabaseGUI extends JFrame {
         int district = showIntInputDialog("ID okresu:", "ID okresu");
         if (district == Integer.MIN_VALUE) return;
 
+        LocalDateTime date = showDateTimeInputDialog();
+        if (date == null) return;
+
         int days = showIntInputDialog("Počet dní:", "Dni");
         if (days == Integer.MIN_VALUE) return;
 
-        LocalDateTime date = LocalDateTime.now();
         List<Person> res = db.getSickPeopleInDistrict(district, date, days);
-        displayPeople(res, "Chorí ľudia v okrese " + district + " (posledných " + days + " dní)");
+        displayPeople(res, "Chorí ľudia v okrese " + district + " k dátumu " + date.toLocalDate() + " (posledných " + days + " dní)");
     }
 
     // 11) sick people in district by value
@@ -382,12 +415,14 @@ public class DatabaseGUI extends JFrame {
         int district = showIntInputDialog("ID okresu:", "ID okresu");
         if (district == Integer.MIN_VALUE) return;
 
+        LocalDateTime date = showDateTimeInputDialog();
+        if (date == null) return;
+
         int days = showIntInputDialog("Počet dní:", "Dni");
         if (days == Integer.MIN_VALUE) return;
 
-        LocalDateTime date = LocalDateTime.now();
         List<Person> res = db.getSickPeopleInDistrictByValue(district, date, days);
-        displayPeople(res, String.format("Chorí ľudia v okrese %d usporiadaní podľa hodnoty testu", district));
+        displayPeople(res, String.format("Chorí ľudia v okrese %d usporiadaní podľa hodnoty testu k dátumu %s", district, date.toLocalDate()));
     }
 
     // 12) sick people in region
@@ -395,56 +430,66 @@ public class DatabaseGUI extends JFrame {
         int region = showIntInputDialog("ID kraja:", "ID kraja");
         if (region == Integer.MIN_VALUE) return;
 
+        LocalDateTime date = showDateTimeInputDialog();
+        if (date == null) return;
+
         int days = showIntInputDialog("Počet dní:", "Dni");
         if (days == Integer.MIN_VALUE) return;
 
-        LocalDateTime date = LocalDateTime.now();
         List<Person> res = db.getSickPeopleInRegion(region, date, days);
-        displayPeople(res, "Chorí ľudia v kraji " + region);
+        displayPeople(res, "Chorí ľudia v kraji " + region + " k dátumu " + date.toLocalDate());
     }
 
     // 13) sick people global
     private void actionSickGlobal(ActionEvent ev) {
+        LocalDateTime date = showDateTimeInputDialog();
+        if (date == null) return;
+
         int days = showIntInputDialog("Počet dní:", "Dni");
         if (days == Integer.MIN_VALUE) return;
 
-        LocalDateTime date = LocalDateTime.now();
         List<Person> res = db.getSickPeople(date, days);
-        displayPeople(res, "Chorí ľudia (globálne)");
+        displayPeople(res, "Chorí ľudia (globálne) k dátumu " + date.toLocalDate());
     }
 
     // 14) max value per district
     private void actionMaxPerDistrict(ActionEvent ev) {
+        LocalDateTime date = showDateTimeInputDialog();
+        if (date == null) return;
+
         int days = showIntInputDialog("Počet dní:", "Dni");
         if (days == Integer.MIN_VALUE) return;
 
-        LocalDateTime date = LocalDateTime.now();
         List<Person> res = db.getMaxValueSickPerDistrict(date, days);
-        displayPeople(res, "Osoby s najvyššou hodnotou testu v každom okrese");
+        displayPeople(res, "Osoby s najvyššou hodnotou testu v každom okrese k dátumu " + date.toLocalDate());
     }
 
     // 15) districts by sick count
     private void actionDistrictsByCount(ActionEvent ev) {
+        LocalDateTime date = showDateTimeInputDialog();
+        if (date == null) return;
+
         int days = showIntInputDialog("Počet dní:", "Dni");
         if (days == Integer.MIN_VALUE) return;
 
-        LocalDateTime date = LocalDateTime.now();
-        List<Integer> res = db.getDistrictsBySickCount(date, days);
+        List<DistrictBySickCount> res = db.getDistrictsBySickCount(date, days);
         output.setText("");
-        appendAndScroll("Okresy usporiadané podľa počtu chorých (zostupne):");
-        for (Integer d : res) appendAndScroll(String.valueOf(d));
+        appendAndScroll("Okresy usporiadané podľa počtu chorých (zostupne) k dátumu " + date.toLocalDate() + ":");
+        for (DistrictBySickCount d : res) appendAndScroll(String.format("Okres %d - %d chorých", d.getDistrictId(), d.getSickCount()));
     }
 
     // 16) regions by sick count
     private void actionRegionsByCount(ActionEvent ev) {
+        LocalDateTime date = showDateTimeInputDialog();
+        if (date == null) return;
+
         int days = showIntInputDialog("Počet dní:", "Dni");
         if (days == Integer.MIN_VALUE) return;
 
-        LocalDateTime date = LocalDateTime.now();
-        List<Integer> res = db.getRegionsBySickCount(date, days);
+        List<RegionBySickCount> res = db.getRegionsBySickCount(date, days);
         output.setText("");
-        appendAndScroll("Kraje usporiadané podľa počtu chorých (zostupne):");
-        for (Integer r : res) appendAndScroll(String.valueOf(r));
+        appendAndScroll("Kraje usporiadané podľa počtu chorých (zostupne) k dátumu " + date.toLocalDate() + ":");
+        for (RegionBySickCount r : res) appendAndScroll(String.format("Kraj %d - %d chorých", r.getRegionId(), r.getSickCount()));
     }
 
     // 19) insert person detail (dialog)
@@ -493,7 +538,7 @@ public class DatabaseGUI extends JFrame {
         appendAndScroll(ok ? "Osoba a jej testy vymazané: " + pid : "Osoba neexistuje: " + pid);
     }
 
-    // generator async
+    // generator
     private void actionGenerateAsync(ActionEvent ev) {
         JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
 
@@ -584,6 +629,32 @@ public class DatabaseGUI extends JFrame {
         }
     }
 
+    private void actionExportCSV(ActionEvent ev) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setDialogTitle("Vyberte priečinok pre export");
+
+        int result = fileChooser.showSaveDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedDir = fileChooser.getSelectedFile();
+            db.exportToCSV(selectedDir.getAbsolutePath());
+            appendAndScroll("Export dokončený do: " + selectedDir.getAbsolutePath());
+        }
+    }
+
+    private void actionImportCSV(ActionEvent ev) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setDialogTitle("Vyberte priečinok s CSV súbormi");
+
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedDir = fileChooser.getSelectedFile();
+            db.importFromCSV(selectedDir.getAbsolutePath());
+            appendAndScroll("Import dokončený z: " + selectedDir.getAbsolutePath());
+        }
+    }
+
     private void displayPeople(List<Person> list, String heading) {
         output.setText("");
         appendAndScroll("*** " + heading + " ***");
@@ -599,7 +670,7 @@ public class DatabaseGUI extends JFrame {
                 person.getLastName(),
                 person.getPatientId(),
                 person.getDateOfBirth(),
-                person.getTests().inorder().size());
+                person.getTestsByDate().inorder().size());
     }
 
     private void displayTests(List<PCRTest> list, String heading) {

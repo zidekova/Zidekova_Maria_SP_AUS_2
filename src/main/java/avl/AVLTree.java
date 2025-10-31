@@ -23,14 +23,20 @@ public class AVLTree<T extends Comparable<T>> extends BSTree<T> {
 
         AVLNode<T> current = inserted.getParent();
         while (current != null) {
+            int oldBalanceFactor = this.getBalanceFactor(current);
             this.updateHeight(current);
-            int balanceFactor = this.getBalanceFactor(current);
+            int newBalanceFactor = this.getBalanceFactor(current);
 
-            if (balanceFactor < -1 || balanceFactor > 1) {
-                this.balance(current);
+            if (oldBalanceFactor == 0 && newBalanceFactor != 0) {
+                current = current.getParent();
+            } else if (oldBalanceFactor != 0 && newBalanceFactor == 0) {
+                break;
+            } else {
+                if (newBalanceFactor < -1 || newBalanceFactor > 1) {
+                    this.balance(current);
+                }
+                current = current.getParent();
             }
-
-            current = current.getParent();
         }
 
         return inserted;
@@ -43,19 +49,26 @@ public class AVLTree<T extends Comparable<T>> extends BSTree<T> {
 
     @Override
     public AVLNode<T> delete(T data) {
-        AVLNode<T> current = (AVLNode<T>) super.delete(data);
+        AVLNode<T> deleted = (AVLNode<T>) super.delete(data);
 
-        if (current == null) return null;
+        if (deleted == null) return null;
 
+        AVLNode<T> current = deleted;
         while (current != null) {
+            int oldBalanceFactor = this.getBalanceFactor(current);
             this.updateHeight(current);
-            int balanceFactor = this.getBalanceFactor(current);
+            int newBalanceFactor = this.getBalanceFactor(current);
 
-            if (balanceFactor < -1 || balanceFactor > 1) {
-                this.balance(current);
+            if (oldBalanceFactor != 0 && newBalanceFactor == 0) {
+                current = current.getParent();
+            } else if (oldBalanceFactor == 0 && newBalanceFactor != 0) {
+                break;
+            } else {
+                if (newBalanceFactor < -1 || newBalanceFactor > 1) {
+                    this.balance(current);
+                }
+                current = current.getParent();
             }
-
-            current = current.getParent();
         }
 
         return current;

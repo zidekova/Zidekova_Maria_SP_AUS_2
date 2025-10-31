@@ -9,8 +9,8 @@ import java.util.Random;
 
 public class DataGenerator {
     private static final String[] firstNames = {"Anna","Peter","Maria","Jozef","Eva","Michal","Katarina"};
-    private static final String[] lastNames = {"Novak","Horak","Kral","Bielik","Farkaš","Kovac","Urban"};
-    private static Random rand = new Random();
+    private static final String[] lastNames = {"Novak","Horak","Kral","Bielik","Farkas","Kovac","Urban"};
+    private static final Random rand = new Random();
 
     public static Person generatePerson(int id) {
         String firstName = firstNames[rand.nextInt(firstNames.length)];
